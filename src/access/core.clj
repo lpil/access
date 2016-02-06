@@ -21,21 +21,22 @@
   (q/fill 255)
   (let [x (q/mouse-x)
         y (q/mouse-y)]
-    (q/rect (- x 10) (- y 10 ) 20 20)
+    (q/rect (- x 10) (- y 10) 20 20)
     (weki-send-xy x y)))
 
 (defn setup [] {})
 (defn step [state] state)
 
-(defn key-pressed [state event]
-  (case (int (:key state))
-    :1 (weki-start-recording 1) ; V
-    :2 (weki-start-recording 2) ; A
-    :3 (weki-start-recording 3)
-    :4 (weki-start-recording 4)))
+ ; 1 V
+ ; 2 A
 
-(defn key-released [_state]
-  (weki-stop-recording))
+(defn key-pressed [state event]
+  (weki-start-recording (int 3))
+  state)
+
+(defn key-released [state]
+  (weki-stop-recording)
+  state)
 
 (defn draw [state]
   (q/no-stroke)
