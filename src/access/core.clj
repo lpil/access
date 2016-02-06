@@ -1,36 +1,48 @@
 (ns access.core
+  (use overtone.osc)
   (:require [quil.core :as q]
             [quil.middleware]))
+
+
+(def weki-port 6448)
+(def weki-client (osc-client "localhost" weki-port))
+
+(defn weki-send-xy [x y]
+  (osc-send weki-client "/wek/inputs" x y))
+
+(defn weki-start-recording [n]
+  (osc-send weki-client "/wekinator/control/startDtwRecording" (int n)))
+
+(defn weki-stop-recording []
+  (osc-send weki-client "/wekinator/control/stopDtwRecording"))
+
 
 (defn register-position []
   (q/fill 255)
   (let [x (q/mouse-x)
         y (q/mouse-y)]
-    (q/rect (- x 10) (- y 10 ) 20 20)))
+    (q/rect (- x 10) (- y 10 ) 20 20)
+    (weki-send-xy x y)))
 
-
-(defn setup []
-  {:inputting? false})
-
+(defn setup [] {})
 (defn step [state] state)
 
-
 (defn key-pressed [state event]
-  (assoc state :inputting? true))
+  (case (int (:key state))
+    :1 (weki-start-recording 1) ; V
+    :2 (weki-start-recording 2) ; A
+    :3 (weki-start-recording 3)
+    :4 (weki-start-recording 4)))
 
 (defn key-released [_state]
-  (setup))
-
+  (weki-stop-recording))
 
 (defn draw [state]
   (q/no-stroke)
   (q/fill 0 10)
   (q/rect 0 0 (q/width) (q/height))
   (q/fill 255)
-  (if (:inputting? state)
-    (register-position)
-    nil))
-
+  (register-position))
 
 (defn run []
   (q/defsketch example
